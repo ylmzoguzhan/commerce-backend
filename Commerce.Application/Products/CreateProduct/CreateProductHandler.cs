@@ -1,8 +1,9 @@
+using Commerce.Application.Products;
 using Commerce.Domain;
 
 namespace Commerce.Application.Products.CreateProduct;
 
-public sealed class CreateProductHandler
+public sealed class CreateProductHandler(IProductRepository repository)
 {
     public CreateProductResult Handle(CreateProductCommand command)
     {
@@ -11,7 +12,7 @@ public sealed class CreateProductHandler
             command.Description,
             command.Price,
             command.Currency);
-
+        repository.Add(product);
         return new CreateProductResult(
             product.Id,
             product.Name,

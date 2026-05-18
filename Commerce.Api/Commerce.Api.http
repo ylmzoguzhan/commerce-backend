@@ -7,3 +7,7 @@ Content-Type: application/json
   "price": 45000,
   "currency": "TRY"
 }
+
+###
+
+GET http://localhost:5284/products/00000000-0000-0000-0000-000000000000

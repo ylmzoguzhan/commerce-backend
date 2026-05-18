@@ -1,4 +1,6 @@
+using Commerce.Application.Products;
 using Commerce.Application.Products.CreateProduct;
+using Commerce.Domain;
 using Xunit;
 
 namespace Commerce.Tests;
@@ -8,7 +10,8 @@ public class CreateProductHandlerTests
     [Fact]
     public void Handle_WithValidCommand_ShouldCreateProductAndReturnResult()
     {
-        var handler = new CreateProductHandler();
+        var repository = new FakeProductRepository();
+        var handler = new CreateProductHandler(repository);
         var command = new CreateProductCommand(
             Name: "Kablosuz Kulaklık",
             Description: "Gürültü engelleyici özellikli",
@@ -25,6 +28,13 @@ public class CreateProductHandlerTests
         Assert.Equal(command.Currency, result.Currency);
         Assert.True(result.IsActive);
         Assert.True(result.CreatedAt <= DateTimeOffset.UtcNow);
+
+        var savedProduct = Assert.Single(repository.Products);
+        Assert.Equal(result.Id, savedProduct.Id);
+        Assert.Equal(command.Name, savedProduct.Name);
+        Assert.Equal(command.Description, savedProduct.Description);
+        Assert.Equal(command.Price, savedProduct.Price);
+        Assert.Equal(command.Currency, savedProduct.Currency);
     }
 
     [Theory]
@@ -32,7 +42,8 @@ public class CreateProductHandlerTests
     [InlineData(null)]
     public void Handle_WithInvalidName_ShouldThrowException(string? name)
     {
-        var handler = new CreateProductHandler();
+        var repository = new FakeProductRepository();
+        var handler = new CreateProductHandler(repository);
         var command = new CreateProductCommand(
             Name: name!,
             Description: "Su geçirmez",
@@ -42,6 +53,7 @@ public class CreateProductHandlerTests
         var exception = Assert.Throws<Exception>(() => handler.Handle(command));
 
         Assert.Equal("İsim boş olamaz", exception.Message);
+        Assert.Empty(repository.Products);
     }
 
     [Theory]
@@ -49,7 +61,8 @@ public class CreateProductHandlerTests
     [InlineData(-100)]
     public void Handle_WithInvalidPrice_ShouldThrowException(decimal price)
     {
-        var handler = new CreateProductHandler();
+        var repository = new FakeProductRepository();
+        var handler = new CreateProductHandler(repository);
         var command = new CreateProductCommand(
             Name: "Akıllı Saat",
             Description: "Su geçirmez",
@@ -59,5 +72,6 @@ public class CreateProductHandlerTests
         var exception = Assert.Throws<Exception>(() => handler.Handle(command));
 
         Assert.Equal("Değer 0 ve negatif olamaz", exception.Message);
+        Assert.Empty(repository.Products);
     }
 }
