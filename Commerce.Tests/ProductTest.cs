@@ -25,17 +25,19 @@ public class ProductTests
     [InlineData(null)]
     public void Create_EmptyName_ShouldThrowException(string? name)
     {
-        var exception = Assert.Throws<Exception>(() => Product.Create(name!, "Açıklama", 100, "TL"));
+        var exception = Assert.Throws<ArgumentException>(() => Product.Create(name!, "Açıklama", 100, "TL"));
 
-        Assert.Equal("İsim boş olamaz", exception.Message);
+        Assert.StartsWith("İsim boş olamaz", exception.Message);
+        Assert.Equal("name", exception.ParamName);
     }
 
     [Fact]
     public void Create_ShortName_ShouldThrowException()
     {
-        var exception = Assert.Throws<Exception>(() => Product.Create("Ab", "Açıklama", 100, "TL"));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => Product.Create("Ab", "Açıklama", 100, "TL"));
 
-        Assert.Equal("İsim 3 karakterden az olamaz", exception.Message);
+        Assert.Contains("İsim 3 karakterden az olamaz", exception.Message);
+        Assert.Equal("name", exception.ParamName);
     }
 
     [Theory]
@@ -43,9 +45,10 @@ public class ProductTests
     [InlineData(-1)]
     public void Create_ZeroOrNegativePrice_ShouldThrowException(decimal price)
     {
-        var exception = Assert.Throws<Exception>(() => Product.Create("Laptop", "Açıklama", price, "TL"));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => Product.Create("Laptop", "Açıklama", price, "TL"));
 
-        Assert.Equal("Değer 0 ve negatif olamaz", exception.Message);
+        Assert.Contains("Değer 0 ve negatif olamaz", exception.Message);
+        Assert.Equal("price", exception.ParamName);
     }
 
     [Theory]
@@ -53,9 +56,10 @@ public class ProductTests
     [InlineData(null)]
     public void Create_EmptyCurrency_ShouldThrowException(string? currency)
     {
-        var exception = Assert.Throws<Exception>(() => Product.Create("Laptop", "Açıklama", 100, currency!));
+        var exception = Assert.Throws<ArgumentException>(() => Product.Create("Laptop", "Açıklama", 100, currency!));
 
-        Assert.Equal("Currency boş olamaz", exception.Message);
+        Assert.StartsWith("Currency boş olamaz", exception.Message);
+        Assert.Equal("currency", exception.ParamName);
     }
 
     [Fact]
@@ -78,9 +82,10 @@ public class ProductTests
         var product = Product.Create("Laptop", "Oyun Bilgisayarı", 15000, "TL");
         decimal invalidPrice = -50;
 
-        var exception = Assert.Throws<Exception>(() => product.ChangePrice(invalidPrice));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => product.ChangePrice(invalidPrice));
 
-        Assert.Equal("Değer 0 ve negatif olamaz", exception.Message);
+        Assert.Contains("Değer 0 ve negatif olamaz", exception.Message);
+        Assert.Equal("price", exception.ParamName);
     }
     [Fact]
     public void Rename_ValidName_ShouldUpdateName()
@@ -102,9 +107,10 @@ public class ProductTests
         var product = Product.Create("Eski İsim", "Açıklama", 100, "TL");
         string shortName = "Ab";
 
-        var exception = Assert.Throws<Exception>(() => product.Rename(shortName));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => product.Rename(shortName));
 
-        Assert.Equal("İsim 3 karakterden az olamaz", exception.Message);
+        Assert.Contains("İsim 3 karakterden az olamaz", exception.Message);
+        Assert.Equal("name", exception.ParamName);
     }
 
     [Fact]

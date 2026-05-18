@@ -50,9 +50,10 @@ public class CreateProductHandlerTests
             Price: 100,
             Currency: "TL");
 
-        var exception = Assert.Throws<Exception>(() => handler.Handle(command));
+        var exception = Assert.Throws<ArgumentException>(() => handler.Handle(command));
 
-        Assert.Equal("İsim boş olamaz", exception.Message);
+        Assert.StartsWith("İsim boş olamaz", exception.Message);
+        Assert.Equal("name", exception.ParamName);
         Assert.Empty(repository.Products);
     }
 
@@ -69,9 +70,10 @@ public class CreateProductHandlerTests
             Price: price,
             Currency: "TL");
 
-        var exception = Assert.Throws<Exception>(() => handler.Handle(command));
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => handler.Handle(command));
 
-        Assert.Equal("Değer 0 ve negatif olamaz", exception.Message);
+        Assert.Contains("Değer 0 ve negatif olamaz", exception.Message);
+        Assert.Equal("price", exception.ParamName);
         Assert.Empty(repository.Products);
     }
 }

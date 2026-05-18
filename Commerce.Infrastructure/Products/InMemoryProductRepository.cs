@@ -12,8 +12,13 @@ public class InMemoryProductRepository : IProductRepository
         _products.Add(product);
     }
 
-    public Product? GetById(Guid Id)
+    public IReadOnlyCollection<Product> GetAll()
     {
-        return _products.FirstOrDefault(op => op.Id == Id);
+        return _products.ToList();
+    }
+
+    public Product? GetById(Guid id)
+    {
+        return _products.FirstOrDefault(product => product.Id == id);
     }
 }

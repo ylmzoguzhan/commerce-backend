@@ -1,14 +1,13 @@
-using Commerce.Application.Products;
-using Commerce.Application.Products.CreateProduct;
-using Commerce.Application.Products.GetProductById;
-using Commerce.Infrastructure.Products;
+using Commerce.Api.Endpoints;
+using Commerce.Application;
+using Commerce.Infrastructure;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<CreateProductHandler>();
-builder.Services.AddScoped<GetProductByIdHandler>();
-builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
@@ -19,30 +18,34 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/products", (CreateProductRequest request, CreateProductHandler handler) =>
+app.UseExceptionHandler(exceptionHandlerApp =>
 {
-    try
+    exceptionHandlerApp.Run(async context =>
     {
-        var command = new CreateProductCommand(request.Name, request.Description, request.Price, request.Currency);
-        var result = handler.Handle(command);
-        return Results.Created($"/products/{result.Id}", result);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { error = ex.Message });
-    }
+        var exceptionFeature = context.Features.Get<IExceptionHandlerFeature>();
+        var exception = exceptionFeature?.Error;
+
+        context.Response.ContentType = "application/json";
+
+        if (exception is ArgumentException or ArgumentOutOfRangeException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = exception.Message
+            });
+
+            return;
+        }
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = "An unexpected error occurred."
+        });
+    });
 });
 
-app.MapGet("/products/{id:guid}", (Guid id, GetProductByIdHandler handler) =>
-{
-    var query = new GetProductByIdQuery(id);
-    var result = handler.Handle(query);
-
-    return result is null
-        ? Results.NotFound()
-        : Results.Ok(result);
-});
+app.MapProductEndpoints();
 
 app.Run();
-
-record CreateProductRequest(string Name, string Description, decimal Price, string Currency);

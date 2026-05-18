@@ -2,7 +2,7 @@ POST http://localhost:5284/products
 Content-Type: application/json
 
 {
-  "name": "Laptop",
+  "name": "Laptop4",
   "description": "Gaming laptop",
   "price": 45000,
   "currency": "TRY"
@@ -10,4 +10,8 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:5284/products/00000000-0000-0000-0000-000000000000
+GET http://localhost:5284/products/d9f25a9e-68ff-4ba1-93fc-d5d3a24ef0fe
+
+###
+
+GET http://localhost:5284/products

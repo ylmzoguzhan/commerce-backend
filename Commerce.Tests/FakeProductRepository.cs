@@ -12,8 +12,13 @@ public sealed class FakeProductRepository : IProductRepository
         Products.Add(product);
     }
 
-    public Product? GetById(Guid Id)
+    public IReadOnlyCollection<Product> GetAll()
     {
-        return Products.FirstOrDefault(op => op.Id == Id);
+        return Products.ToList();
+    }
+
+    public Product? GetById(Guid id)
+    {
+        return Products.FirstOrDefault(product => product.Id == id);
     }
 }

@@ -5,5 +5,6 @@ namespace Commerce.Application.Products;
 public interface IProductRepository
 {
     void Add(Product product);
-    Product? GetById(Guid Id);
+    Product? GetById(Guid id);
+    IReadOnlyCollection<Product> GetAll();
 }

@@ -24,30 +24,30 @@ public class Product
     }
     public static Product Create(string name, string description, decimal price, string currency)
     {
-        if (string.IsNullOrEmpty(name))
-            throw new Exception("İsim boş olamaz");
-        if (string.IsNullOrEmpty(currency))
-            throw new Exception("Currency boş olamaz");
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("İsim boş olamaz", nameof(name));
+        if (string.IsNullOrWhiteSpace(currency))
+            throw new ArgumentException("Currency boş olamaz", nameof(currency));
         if (name.Length < 3)
-            throw new Exception("İsim 3 karakterden az olamaz");
+            throw new ArgumentOutOfRangeException(nameof(name), "İsim 3 karakterden az olamaz");
         if (price <= 0)
-            throw new Exception("Değer 0 ve negatif olamaz");
+            throw new ArgumentOutOfRangeException(nameof(price), "Değer 0 ve negatif olamaz");
         Product product = new(Guid.NewGuid(), name, description, price, currency, true);
         return product;
     }
     public void ChangePrice(decimal price)
     {
         if (price <= 0)
-            throw new Exception("Değer 0 ve negatif olamaz");
+            throw new ArgumentOutOfRangeException(nameof(price), "Değer 0 ve negatif olamaz");
         Price = price;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
     public void Rename(string name)
     {
-        if (string.IsNullOrEmpty(name))
-            throw new Exception("İsim boş olamaz");
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("İsim boş olamaz", nameof(name));
         if (name.Length < 3)
-            throw new Exception("İsim 3 karakterden az olamaz");
+            throw new ArgumentOutOfRangeException(nameof(name), "İsim 3 karakterden az olamaz");
         Name = name;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
