@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Commerce.Api/Commerce.Api.csproj" />
+  <Project Path="Commerce.Application/Commerce.Application.csproj" />
+  <Project Path="Commerce.Domain/Commerce.Domain.csproj" />
+  <Project Path="Commerce.Infrastructure/Commerce.Infrastructure.csproj" />
+  <Project Path="Commerce.Tests/Commerce.Tests.csproj" />
+</Solution>
