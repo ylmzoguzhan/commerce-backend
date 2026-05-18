@@ -1,6 +1,9 @@
-@Commerce.Api_HostAddress = http://localhost:5284
+POST http://localhost:5284/products
+Content-Type: application/json
 
-GET {{Commerce.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
+{
+  "name": "Laptop",
+  "description": "Gaming laptop",
+  "price": 45000,
+  "currency": "TRY"
+}
