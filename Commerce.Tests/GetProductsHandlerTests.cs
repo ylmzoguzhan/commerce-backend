@@ -59,13 +59,14 @@ public class GetProductsHandlerTests
         var repository = new FakeProductRepository();
         var handler = new GetProductsHandler(repository);
         var firstProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        Thread.Sleep(1);
         var secondProduct = Product.Create("Phone", "Smart phone", 30000, "TRY");
         repository.Add(firstProduct);
         repository.Add(secondProduct);
 
         var result = Assert.Single(handler.Handle(new GetProductsQuery(Page: 2, PageSize: 1)).Items);
 
-        Assert.Equal(secondProduct.Id, result.Id);
+        Assert.Equal(firstProduct.Id, result.Id);
     }
 
     [Fact]

@@ -1,3 +1,4 @@
+using Commerce.Application.Products.ChangeProductPrice;
 using Commerce.Application.Products.CreateProduct;
 using Commerce.Application.Products.GetProductById;
 using Commerce.Application.Products.GetProducts;
@@ -32,8 +33,18 @@ public static class ProductEndpoints
             return Results.Ok(result);
         });
 
+        app.MapPatch("/products/{id:guid}/price", (Guid id, ChangeProductPriceRequest request, ChangeProductPriceHandler handler) =>
+        {
+            var result = handler.Handle(new ChangeProductPriceCommand(id, request.NewPrice));
+
+            return result is null
+                ? Results.NotFound()
+                : Results.Ok(result);
+        });
+
         return app;
     }
 }
 
 public sealed record CreateProductRequest(string Name, string Description, decimal Price, string Currency);
+public sealed record ChangeProductPriceRequest(decimal NewPrice);

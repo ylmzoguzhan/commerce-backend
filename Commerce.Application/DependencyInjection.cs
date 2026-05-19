@@ -1,3 +1,4 @@
+using Commerce.Application.Products.ChangeProductPrice;
 using Commerce.Application.Products.CreateProduct;
 using Commerce.Application.Products.GetProductById;
 using Commerce.Application.Products.GetProducts;
@@ -12,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<CreateProductHandler>();
         services.AddScoped<GetProductByIdHandler>();
         services.AddScoped<GetProductsHandler>();
+        services.AddScoped<ChangeProductPriceHandler>();
         return services;
     }
 }

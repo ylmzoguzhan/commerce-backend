@@ -2,9 +2,9 @@ POST http://localhost:5284/products
 Content-Type: application/json
 
 {
-  "name": "Laptop2",
+  "name": "kalem",
   "description": "Gaming laptop",
-  "price": 5000,
+  "price": 200,
   "currency": "TRY"
 }
 
@@ -14,4 +14,12 @@ GET http://localhost:5284/products/d9f25a9e-68ff-4ba1-93fc-d5d3a24ef0fe
 
 ###
 
-GET http://localhost:5284/products?page=1&pageSize=5&sortBy=price&sortDirection=desc
+GET http://localhost:5284/products?search=kale&page=1&pageSize=5
+
+###
+PATCH http://localhost:5284/products/ea53751e-006d-4a46-87c0-29a840a73add/price
+Content-Type: application/json
+
+{
+  "newPrice": 1001
+}
