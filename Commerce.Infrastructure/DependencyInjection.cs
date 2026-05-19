@@ -1,3 +1,4 @@
+using Commerce.Application;
 using Commerce.Application.Products;
 using Commerce.Infrastructure.Products;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<IProductRepository, InMemoryProductRepository>();
-
+        services.AddSingleton<IClock, SystemClock>();
         return services;
     }
 }

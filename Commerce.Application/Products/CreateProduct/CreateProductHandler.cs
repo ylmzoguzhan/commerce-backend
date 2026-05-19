@@ -3,15 +3,17 @@ using Commerce.Domain;
 
 namespace Commerce.Application.Products.CreateProduct;
 
-public sealed class CreateProductHandler(IProductRepository repository)
+public sealed class CreateProductHandler(IProductRepository repository, IClock clock)
 {
     public CreateProductResult Handle(CreateProductCommand command)
     {
         var product = Product.Create(
+            Guid.NewGuid(),
             command.Name,
             command.Description,
             command.Price,
-            command.Currency);
+            command.Currency,
+            clock.UtcNow);
         repository.Add(product);
         return new CreateProductResult(
             product.Id,
