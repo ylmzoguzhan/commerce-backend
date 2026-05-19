@@ -11,7 +11,7 @@ public class Product
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
 
-    private Product(Guid id, string name, string description, decimal price, string currency, bool isActive)
+    private Product(Guid id, string name, string description, decimal price, string currency, bool isActive, DateTimeOffset createdAt)
     {
         Id = id;
         Name = name;
@@ -19,10 +19,10 @@ public class Product
         Price = price;
         Currency = currency;
         IsActive = isActive;
-        CreatedAt = DateTimeOffset.UtcNow;
-        UpdatedAt = DateTimeOffset.UtcNow;
+        CreatedAt = createdAt;
+        UpdatedAt = createdAt;
     }
-    public static Product Create(string name, string description, decimal price, string currency)
+    public static Product Create(Guid id, string name, string description, decimal price, string currency, DateTimeOffset createdAt)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("İsim boş olamaz", nameof(name));
@@ -32,8 +32,12 @@ public class Product
             throw new ArgumentOutOfRangeException(nameof(name), "İsim 3 karakterden az olamaz");
         if (price <= 0)
             throw new ArgumentOutOfRangeException(nameof(price), "Değer 0 ve negatif olamaz");
-        Product product = new(Guid.NewGuid(), name, description, price, currency, true);
+        Product product = new(id, name, description, price, currency, true, createdAt);
         return product;
+    }
+    public static Product Create(string name, string description, decimal price, string currency)
+    {
+        return Create(Guid.NewGuid(), name, description, price, currency, DateTimeOffset.UtcNow);
     }
     public void ChangePrice(decimal price)
     {

@@ -20,6 +20,44 @@ public class ProductTests
         Assert.True(product.UpdatedAt <= DateTimeOffset.UtcNow);
     }
 
+    [Fact]
+    public void Create_WithProvidedId_ShouldUseProvidedId()
+    {
+        var id = Guid.NewGuid();
+
+        var product = Product.Create(id, "Laptop", "Oyun Bilgisayarı", 15000, "TL", DateTimeOffset.UtcNow);
+
+        Assert.Equal(id, product.Id);
+    }
+
+    [Fact]
+    public void Create_WithProvidedCreatedAt_ShouldUseProvidedCreatedAt()
+    {
+        var createdAt = new DateTimeOffset(2026, 5, 19, 10, 30, 0, TimeSpan.Zero);
+
+        var product = Product.Create(Guid.NewGuid(), "Laptop", "Oyun Bilgisayarı", 15000, "TL", createdAt);
+
+        Assert.Equal(createdAt, product.CreatedAt);
+    }
+
+    [Fact]
+    public void Create_WithProvidedCreatedAt_ShouldSetUpdatedAtToCreatedAt()
+    {
+        var createdAt = new DateTimeOffset(2026, 5, 19, 10, 30, 0, TimeSpan.Zero);
+
+        var product = Product.Create(Guid.NewGuid(), "Laptop", "Oyun Bilgisayarı", 15000, "TL", createdAt);
+
+        Assert.Equal(createdAt, product.UpdatedAt);
+    }
+
+    [Fact]
+    public void Create_ValidData_ShouldSetCreatedAtAndUpdatedAtToSameValue()
+    {
+        var product = Product.Create("Laptop", "Oyun Bilgisayarı", 15000, "TL");
+
+        Assert.Equal(product.CreatedAt, product.UpdatedAt);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
