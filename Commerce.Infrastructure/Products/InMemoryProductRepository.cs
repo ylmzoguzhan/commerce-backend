@@ -12,13 +12,18 @@ public class InMemoryProductRepository : IProductRepository
         _products.Add(product);
     }
 
-    public IReadOnlyCollection<Product> GetAll()
+    public int Count()
     {
-        return _products.ToList();
+        return _products.Count();
     }
 
     public Product? GetById(Guid id)
     {
         return _products.FirstOrDefault(product => product.Id == id);
+    }
+
+    public IReadOnlyCollection<Product> GetPaged(int page, int pageSize)
+    {
+        return _products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 }

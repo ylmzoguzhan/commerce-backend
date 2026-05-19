@@ -8,3 +8,9 @@ public sealed record GetProductsResult(
     string Currency,
     bool IsActive,
     DateTimeOffset CreatedAt);
+public sealed record GetProductsResponse(
+    IReadOnlyCollection<GetProductsResult> Items,
+    int Page,
+    int PageSize,
+    int TotalCount,
+    int TotalPages);

@@ -24,9 +24,10 @@ public static class ProductEndpoints
                 ? Results.NotFound()
                 : Results.Ok(result);
         });
-        app.MapGet("/products", (GetProductsHandler handler) =>
+        app.MapGet("/products", (GetProductsHandler handler, int page = 1, int pageSize = 20) =>
         {
-            var result = handler.Handle();
+            var query = new GetProductsQuery(page, pageSize);
+            var result = handler.Handle(query);
 
             return Results.Ok(result);
         });

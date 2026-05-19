@@ -12,13 +12,18 @@ public sealed class FakeProductRepository : IProductRepository
         Products.Add(product);
     }
 
-    public IReadOnlyCollection<Product> GetAll()
+    public int Count()
     {
-        return Products.ToList();
+        return Products.Count();
     }
 
     public Product? GetById(Guid id)
     {
         return Products.FirstOrDefault(product => product.Id == id);
+    }
+
+    public IReadOnlyCollection<Product> GetPaged(int page, int pageSize)
+    {
+        return Products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
     }
 }
