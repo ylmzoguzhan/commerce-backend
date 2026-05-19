@@ -10,7 +10,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:5284/products/0255afd1-0d8c-4234-b736-9f29c73e8910
+GET http://localhost:5284/products/9f8797e7-959a-4ea6-a63a-64834fe51174
 
 ###
 
@@ -25,7 +25,15 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:5284/products/0255afd1-0d8c-4234-b736-9f29c73e8910/deactivate
+PATCH http://localhost:5284/products/9f8797e7-959a-4ea6-a63a-64834fe51174/deactivate
 
 ###
-PATCH http://localhost:5284/products/0255afd1-0d8c-4234-b736-9f29c73e8910/activate
+PATCH http://localhost:5284/products/9f8797e7-959a-4ea6-a63a-64834fe51174/activate
+
+###
+PATCH http://localhost:5284/products/9f8797e7-959a-4ea6-a63a-64834fe51174/name
+Content-Type: application/json
+
+{
+  "name": "defter"
+}

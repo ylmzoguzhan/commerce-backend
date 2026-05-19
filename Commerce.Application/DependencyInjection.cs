@@ -1,4 +1,5 @@
 using Commerce.Application.Products.ActivateProduct;
+using Commerce.Application.Products.ChangeProductName;
 using Commerce.Application.Products.ChangeProductPrice;
 using Commerce.Application.Products.CreateProduct;
 using Commerce.Application.Products.DeactivateProduct;
@@ -18,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<ChangeProductPriceHandler>();
         services.AddScoped<DeactivateProductHandler>();
         services.AddScoped<ActivateProductHandler>();
+        services.AddScoped<ChangeProductNameHandler>();
         return services;
     }
 }
