@@ -17,6 +17,15 @@ public sealed class GetProductsHandler(IProductRepository repository)
         if (query.PageSize > MaxPageSize)
             throw new ArgumentOutOfRangeException(nameof(query.PageSize), $"PageSize {MaxPageSize} veya daha kucuk olmalidir");
 
+        if (query.MinPrice < 0)
+            throw new ArgumentOutOfRangeException(nameof(query.MinPrice), "MinPrice 0 veya daha buyuk olmalidir");
+
+        if (query.MaxPrice < 0)
+            throw new ArgumentOutOfRangeException(nameof(query.MaxPrice), "MaxPrice 0 veya daha buyuk olmalidir");
+
+        if (query.MinPrice > query.MaxPrice)
+            throw new ArgumentException("MinPrice MaxPrice degerinden buyuk olamaz", nameof(query.MinPrice));
+
         if (!ValidSortFields.Contains(query.SortBy, StringComparer.OrdinalIgnoreCase))
             throw new ArgumentException("Gecersiz sort alani", nameof(query.SortBy));
 
@@ -24,7 +33,7 @@ public sealed class GetProductsHandler(IProductRepository repository)
             throw new ArgumentException("Gecersiz sort yonu", nameof(query.SortDirection));
 
         var products = repository
-            .GetPaged(query.Page, query.PageSize, query.SortBy, query.SortDirection)
+            .GetPaged(query.Page, query.PageSize, query.SortBy, query.SortDirection, query.Search, query.MinPrice, query.MaxPrice, query.IsActive)
             .Select(product => new GetProductsResult(
                 product.Id,
                 product.Name,
@@ -33,7 +42,7 @@ public sealed class GetProductsHandler(IProductRepository repository)
                 product.Currency,
                 product.IsActive,
                 product.CreatedAt)).ToList();
-        var totalCount = repository.Count();
+        var totalCount = repository.Count(query.Search, query.MinPrice, query.MaxPrice, query.IsActive);
         var totalPages = totalCount == 0
             ? 0
             : (int)Math.Ceiling((double)totalCount / query.PageSize);

@@ -236,4 +236,216 @@ public class GetProductsHandlerTests
 
         Assert.Equal("SortDirection", exception.ParamName);
     }
+
+    [Fact]
+    public void Handle_WithSearchMatchingName_ShouldReturnMatchingProducts()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var matchingProduct = Product.Create("Laptop", "Gaming machine", 45000, "TRY");
+        repository.Add(matchingProduct);
+        repository.Add(Product.Create("Phone", "Smart phone", 30000, "TRY"));
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            Search: "lap")).Items);
+
+        Assert.Equal(matchingProduct.Id, result.Id);
+    }
+
+    [Fact]
+    public void Handle_WithSearchMatchingDescription_ShouldReturnMatchingProducts()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var matchingProduct = Product.Create("Laptop", "Gaming machine", 45000, "TRY");
+        repository.Add(matchingProduct);
+        repository.Add(Product.Create("Phone", "Smart phone", 30000, "TRY"));
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            Search: "gaming")).Items);
+
+        Assert.Equal(matchingProduct.Id, result.Id);
+    }
+
+    [Fact]
+    public void Handle_WithSearch_ShouldBeCaseInsensitive()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var matchingProduct = Product.Create("Laptop", "Gaming machine", 45000, "TRY");
+        repository.Add(matchingProduct);
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            Search: "LAP")).Items);
+
+        Assert.Equal(matchingProduct.Id, result.Id);
+    }
+
+    [Fact]
+    public void Handle_WithMinPrice_ShouldReturnProductsAtOrAboveMinPrice()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var matchingProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        repository.Add(Product.Create("Mouse", "Wireless mouse", 1000, "TRY"));
+        repository.Add(matchingProduct);
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            MinPrice: 10000)).Items);
+
+        Assert.Equal(matchingProduct.Id, result.Id);
+    }
+
+    [Fact]
+    public void Handle_WithMaxPrice_ShouldReturnProductsAtOrBelowMaxPrice()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var matchingProduct = Product.Create("Mouse", "Wireless mouse", 1000, "TRY");
+        repository.Add(matchingProduct);
+        repository.Add(Product.Create("Laptop", "Gaming laptop", 45000, "TRY"));
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            MaxPrice: 10000)).Items);
+
+        Assert.Equal(matchingProduct.Id, result.Id);
+    }
+
+    [Fact]
+    public void Handle_WithMinAndMaxPrice_ShouldReturnProductsInsideRange()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var matchingProduct = Product.Create("Phone", "Smart phone", 30000, "TRY");
+        repository.Add(Product.Create("Mouse", "Wireless mouse", 1000, "TRY"));
+        repository.Add(matchingProduct);
+        repository.Add(Product.Create("Laptop", "Gaming laptop", 45000, "TRY"));
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            MinPrice: 10000,
+            MaxPrice: 40000)).Items);
+
+        Assert.Equal(matchingProduct.Id, result.Id);
+    }
+
+    [Fact]
+    public void Handle_WithIsActiveFalse_ShouldReturnInactiveProducts()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var inactiveProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        inactiveProduct.Deactivate();
+        repository.Add(inactiveProduct);
+        repository.Add(Product.Create("Phone", "Smart phone", 30000, "TRY"));
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            IsActive: false)).Items);
+
+        Assert.Equal(inactiveProduct.Id, result.Id);
+        Assert.False(result.IsActive);
+    }
+
+    [Theory]
+    [InlineData("-1")]
+    [InlineData("-0.01")]
+    public void Handle_WithInvalidMinPrice_ShouldThrowException(string minPrice)
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            handler.Handle(new GetProductsQuery(
+                Page: 1,
+                PageSize: 20,
+                MinPrice: decimal.Parse(minPrice))));
+
+        Assert.Equal("MinPrice", exception.ParamName);
+    }
+
+    [Theory]
+    [InlineData("-1")]
+    [InlineData("-0.01")]
+    public void Handle_WithInvalidMaxPrice_ShouldThrowException(string maxPrice)
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            handler.Handle(new GetProductsQuery(
+                Page: 1,
+                PageSize: 20,
+                MaxPrice: decimal.Parse(maxPrice))));
+
+        Assert.Equal("MaxPrice", exception.ParamName);
+    }
+
+    [Fact]
+    public void Handle_WithMinPriceGreaterThanMaxPrice_ShouldThrowException()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            handler.Handle(new GetProductsQuery(
+                Page: 1,
+                PageSize: 20,
+                MinPrice: 50000,
+                MaxPrice: 10000)));
+
+        Assert.Equal("MinPrice", exception.ParamName);
+    }
+
+    [Fact]
+    public void Handle_WithFiltering_ShouldReturnFilteredTotalCount()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        repository.Add(Product.Create("Laptop", "Gaming laptop", 45000, "TRY"));
+        repository.Add(Product.Create("Mouse", "Wireless mouse", 1000, "TRY"));
+        repository.Add(Product.Create("Monitor", "Gaming monitor", 15000, "TRY"));
+
+        var result = handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 1,
+            Search: "gaming"));
+
+        Assert.Single(result.Items);
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal(2, result.TotalPages);
+    }
+
+    [Fact]
+    public void Handle_ShouldApplyFilteringBeforePagination()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var firstMatchingProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        var secondMatchingProduct = Product.Create("Monitor", "Gaming monitor", 15000, "TRY");
+        repository.Add(Product.Create("Mouse", "Wireless mouse", 1000, "TRY"));
+        repository.Add(firstMatchingProduct);
+        repository.Add(secondMatchingProduct);
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 2,
+            PageSize: 1,
+            Search: "gaming",
+            SortBy: "price",
+            SortDirection: "desc")).Items);
+
+        Assert.Equal(secondMatchingProduct.Id, result.Id);
+    }
 }

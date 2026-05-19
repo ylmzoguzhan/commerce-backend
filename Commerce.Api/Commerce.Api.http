@@ -2,9 +2,9 @@ POST http://localhost:5284/products
 Content-Type: application/json
 
 {
-  "name": "Laptop7",
+  "name": "Laptop2",
   "description": "Gaming laptop",
-  "price": 45000,
+  "price": 5000,
   "currency": "TRY"
 }
 
@@ -14,4 +14,4 @@ GET http://localhost:5284/products/d9f25a9e-68ff-4ba1-93fc-d5d3a24ef0fe
 
 ###
 
-GET http://localhost:5284/products?page=2&pageSize=5
+GET http://localhost:5284/products?page=1&pageSize=5&sortBy=price&sortDirection=desc
