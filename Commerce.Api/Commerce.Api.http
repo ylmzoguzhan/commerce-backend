@@ -37,3 +37,11 @@ Content-Type: application/json
 {
   "name": "defter"
 }
+
+###
+PATCH http://localhost:5284/products/9f8797e7-959a-4ea6-a63a-64834fe51174/description
+Content-Type: application/json
+
+{
+  "description": "Yeni açıklama"
+}

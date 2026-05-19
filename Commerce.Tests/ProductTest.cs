@@ -114,6 +114,38 @@ public class ProductTests
     }
 
     [Fact]
+    public void ChangeDescription_ValidDescription_ShouldUpdateDescription()
+    {
+        var product = Product.Create("Laptop", "Old description", 100, "TL");
+
+        product.ChangeDescription("New description");
+
+        Assert.Equal("New description", product.Description);
+    }
+
+    [Fact]
+    public void ChangeDescription_EmptyDescription_ShouldUpdateDescription()
+    {
+        var product = Product.Create("Laptop", "Old description", 100, "TL");
+
+        product.ChangeDescription("");
+
+        Assert.Equal("", product.Description);
+    }
+
+    [Fact]
+    public void ChangeDescription_ValidDescription_ShouldUpdateTimestamp()
+    {
+        var product = Product.Create("Laptop", "Old description", 100, "TL");
+        var previousUpdatedAt = product.UpdatedAt;
+
+        Thread.Sleep(1);
+        product.ChangeDescription("New description");
+
+        Assert.True(product.UpdatedAt > previousUpdatedAt);
+    }
+
+    [Fact]
     public void Deactivate_ActiveProduct_ShouldMakeProductInactiveAndUpdateTimestamp()
     {
         var product = Product.Create("Laptop", "Oyun Bilgisayarı", 15000, "TL");

@@ -51,6 +51,11 @@ public class Product
         Name = name;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
+    public void ChangeDescription(string description)
+    {
+        Description = description;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
     public void Deactivate()
     {
         IsActive = false;

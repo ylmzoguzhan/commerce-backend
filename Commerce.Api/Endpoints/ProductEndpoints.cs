@@ -1,4 +1,5 @@
 using Commerce.Application.Products.ActivateProduct;
+using Commerce.Application.Products.ChangeProductDescription;
 using Commerce.Application.Products.ChangeProductName;
 using Commerce.Application.Products.ChangeProductPrice;
 using Commerce.Application.Products.CreateProduct;
@@ -68,6 +69,14 @@ public static class ProductEndpoints
                 ? Results.NotFound()
                 : Results.Ok(result);
         });
+        app.MapPatch("/products/{id:guid}/description", (Guid id, ChangeProductDescriptionRequest request, ChangeProductDescriptionHandler handler) =>
+        {
+            var result = handler.Handle(new ChangeProductDescriptionCommand(id, request.Description));
+
+            return result is null
+                ? Results.NotFound()
+                : Results.Ok(result);
+        });
         return app;
     }
 }
@@ -75,3 +84,4 @@ public static class ProductEndpoints
 public sealed record CreateProductRequest(string Name, string Description, decimal Price, string Currency);
 public sealed record ChangeProductPriceRequest(decimal NewPrice);
 public sealed record ChangeProductNameRequest(string Name);
+public sealed record ChangeProductDescriptionRequest(string Description);
