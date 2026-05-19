@@ -1,3 +1,4 @@
+using Commerce.Application.Products.ActivateProduct;
 using Commerce.Application.Products.ChangeProductPrice;
 using Commerce.Application.Products.CreateProduct;
 using Commerce.Application.Products.DeactivateProduct;
@@ -45,6 +46,14 @@ public static class ProductEndpoints
         app.MapPatch("/products/{id:guid}/deactivate", (Guid id, DeactivateProductHandler handler) =>
         {
             var result = handler.Handle(new DeactivateProductCommand(id));
+
+            return result is null
+                ? Results.NotFound()
+                : Results.Ok(result);
+        });
+        app.MapPatch("/products/{id:guid}/activate", (Guid id, ActivateProductHandler handler) =>
+        {
+            var result = handler.Handle(new ActivateProductCommand(id));
 
             return result is null
                 ? Results.NotFound()

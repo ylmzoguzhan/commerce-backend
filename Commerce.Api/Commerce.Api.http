@@ -10,7 +10,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:5284/products/97661d7a-8c34-43d3-9aac-8a2746d721b3
+GET http://localhost:5284/products/0255afd1-0d8c-4234-b736-9f29c73e8910
 
 ###
 
@@ -25,4 +25,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:5284/products/97661d7a-8c34-43d3-9aac-8a2746d721b3/deactivate
+PATCH http://localhost:5284/products/0255afd1-0d8c-4234-b736-9f29c73e8910/deactivate
+
+###
+PATCH http://localhost:5284/products/0255afd1-0d8c-4234-b736-9f29c73e8910/activate
