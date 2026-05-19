@@ -24,9 +24,9 @@ public static class ProductEndpoints
                 ? Results.NotFound()
                 : Results.Ok(result);
         });
-        app.MapGet("/products", (GetProductsHandler handler, int page = 1, int pageSize = 20) =>
+        app.MapGet("/products", (GetProductsHandler handler, int page = 1, int pageSize = 20, string sortBy = "createdAt", string sortDirection = "desc") =>
         {
-            var query = new GetProductsQuery(page, pageSize);
+            var query = new GetProductsQuery(page, pageSize, sortBy, sortDirection);
             var result = handler.Handle(query);
 
             return Results.Ok(result);

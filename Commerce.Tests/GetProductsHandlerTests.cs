@@ -69,6 +69,84 @@ public class GetProductsHandlerTests
     }
 
     [Fact]
+    public void Handle_WithDefaultSorting_ShouldReturnNewestProductsFirst()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var olderProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        Thread.Sleep(1);
+        var newerProduct = Product.Create("Phone", "Smart phone", 30000, "TRY");
+        repository.Add(olderProduct);
+        repository.Add(newerProduct);
+
+        var result = handler.Handle(new GetProductsQuery(Page: 1, PageSize: 20));
+
+        Assert.Equal(newerProduct.Id, result.Items.First().Id);
+        Assert.Equal(olderProduct.Id, result.Items.Last().Id);
+    }
+
+    [Fact]
+    public void Handle_WithNameAscending_ShouldSortByName()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var secondProduct = Product.Create("Phone", "Smart phone", 30000, "TRY");
+        var firstProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        repository.Add(secondProduct);
+        repository.Add(firstProduct);
+
+        var result = handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            SortBy: "name",
+            SortDirection: "asc"));
+
+        Assert.Equal(firstProduct.Id, result.Items.First().Id);
+        Assert.Equal(secondProduct.Id, result.Items.Last().Id);
+    }
+
+    [Fact]
+    public void Handle_WithPriceDescending_ShouldSortByPrice()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var cheaperProduct = Product.Create("Phone", "Smart phone", 30000, "TRY");
+        var expensiveProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        repository.Add(cheaperProduct);
+        repository.Add(expensiveProduct);
+
+        var result = handler.Handle(new GetProductsQuery(
+            Page: 1,
+            PageSize: 20,
+            SortBy: "price",
+            SortDirection: "desc"));
+
+        Assert.Equal(expensiveProduct.Id, result.Items.First().Id);
+        Assert.Equal(cheaperProduct.Id, result.Items.Last().Id);
+    }
+
+    [Fact]
+    public void Handle_ShouldApplySortingBeforePagination()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+        var cheapestProduct = Product.Create("Mouse", "Wireless mouse", 1000, "TRY");
+        var middleProduct = Product.Create("Phone", "Smart phone", 30000, "TRY");
+        var expensiveProduct = Product.Create("Laptop", "Gaming laptop", 45000, "TRY");
+        repository.Add(cheapestProduct);
+        repository.Add(middleProduct);
+        repository.Add(expensiveProduct);
+
+        var result = Assert.Single(handler.Handle(new GetProductsQuery(
+            Page: 2,
+            PageSize: 1,
+            SortBy: "price",
+            SortDirection: "desc")).Items);
+
+        Assert.Equal(middleProduct.Id, result.Id);
+    }
+
+    [Fact]
     public void Handle_WhenProductsExist_ShouldMapProductFields()
     {
         var repository = new FakeProductRepository();
@@ -125,5 +203,37 @@ public class GetProductsHandlerTests
             handler.Handle(new GetProductsQuery(Page: 1, PageSize: 101)));
 
         Assert.Equal("PageSize", exception.ParamName);
+    }
+
+    [Fact]
+    public void Handle_WithInvalidSortBy_ShouldThrowException()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            handler.Handle(new GetProductsQuery(
+                Page: 1,
+                PageSize: 20,
+                SortBy: "unknown",
+                SortDirection: "desc")));
+
+        Assert.Equal("SortBy", exception.ParamName);
+    }
+
+    [Fact]
+    public void Handle_WithInvalidSortDirection_ShouldThrowException()
+    {
+        var repository = new FakeProductRepository();
+        var handler = new GetProductsHandler(repository);
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            handler.Handle(new GetProductsQuery(
+                Page: 1,
+                PageSize: 20,
+                SortBy: "createdAt",
+                SortDirection: "down")));
+
+        Assert.Equal("SortDirection", exception.ParamName);
     }
 }

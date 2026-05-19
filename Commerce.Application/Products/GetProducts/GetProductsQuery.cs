@@ -1,3 +1,7 @@
 namespace Commerce.Application.Products.GetProducts;
 
-public record GetProductsQuery(int Page, int PageSize);
+public sealed record GetProductsQuery(
+    int Page,
+    int PageSize,
+    string SortBy = "createdAt",
+    string SortDirection = "desc");
