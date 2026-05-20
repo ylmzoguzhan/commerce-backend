@@ -3,12 +3,12 @@ using Commerce.Domain;
 
 namespace Commerce.Application.Products.CreateProduct;
 
-public sealed class CreateProductHandler(IProductRepository repository, IClock clock)
+public sealed class CreateProductHandler(IProductRepository repository, IClock clock, IIdGenerator idGenerator)
 {
     public CreateProductResult Handle(CreateProductCommand command)
     {
         var product = Product.Create(
-            Guid.NewGuid(),
+            idGenerator.NewId(),
             command.Name,
             command.Description,
             command.Price,

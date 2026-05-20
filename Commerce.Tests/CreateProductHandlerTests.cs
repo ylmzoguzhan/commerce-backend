@@ -9,12 +9,13 @@ namespace Commerce.Tests;
 public class CreateProductHandlerTests
 {
     private static readonly DateTimeOffset ClockTime = new(2026, 5, 19, 10, 30, 0, TimeSpan.Zero);
+    private static readonly Guid ProductId = Guid.Parse("3f2fdbb1-1f7d-4f9d-a246-a16c1ad00c61");
 
     [Fact]
     public void Handle_WithValidCommand_ShouldCreateProductAndReturnResult()
     {
         var repository = new FakeProductRepository();
-        var handler = new CreateProductHandler(repository, new FakeClock(ClockTime));
+        var handler = new CreateProductHandler(repository, new FakeClock(ClockTime), new FakeIdGenerator(ProductId));
         var command = new CreateProductCommand(
             Name: "Kablosuz Kulaklık",
             Description: "Gürültü engelleyici özellikli",
@@ -24,7 +25,7 @@ public class CreateProductHandlerTests
         var result = handler.Handle(command);
 
         Assert.NotNull(result);
-        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.Equal(ProductId, result.Id);
         Assert.Equal(command.Name, result.Name);
         Assert.Equal(command.Description, result.Description);
         Assert.Equal(command.Price, result.Price);
@@ -33,7 +34,7 @@ public class CreateProductHandlerTests
         Assert.Equal(ClockTime, result.CreatedAt);
 
         var savedProduct = Assert.Single(repository.Products);
-        Assert.Equal(result.Id, savedProduct.Id);
+        Assert.Equal(ProductId, savedProduct.Id);
         Assert.Equal(command.Name, savedProduct.Name);
         Assert.Equal(command.Description, savedProduct.Description);
         Assert.Equal(command.Price, savedProduct.Price);
@@ -48,7 +49,7 @@ public class CreateProductHandlerTests
     public void Handle_WithInvalidName_ShouldThrowException(string? name)
     {
         var repository = new FakeProductRepository();
-        var handler = new CreateProductHandler(repository, new FakeClock(ClockTime));
+        var handler = new CreateProductHandler(repository, new FakeClock(ClockTime), new FakeIdGenerator(ProductId));
         var command = new CreateProductCommand(
             Name: name!,
             Description: "Su geçirmez",
@@ -68,7 +69,7 @@ public class CreateProductHandlerTests
     public void Handle_WithInvalidPrice_ShouldThrowException(decimal price)
     {
         var repository = new FakeProductRepository();
-        var handler = new CreateProductHandler(repository, new FakeClock(ClockTime));
+        var handler = new CreateProductHandler(repository, new FakeClock(ClockTime), new FakeIdGenerator(ProductId));
         var command = new CreateProductCommand(
             Name: "Akıllı Saat",
             Description: "Su geçirmez",
@@ -85,5 +86,13 @@ public class CreateProductHandlerTests
     private sealed class FakeClock(DateTimeOffset utcNow) : IClock
     {
         public DateTimeOffset UtcNow { get; } = utcNow;
+    }
+
+    private sealed class FakeIdGenerator(Guid id) : IIdGenerator
+    {
+        public Guid NewId()
+        {
+            return id;
+        }
     }
 }

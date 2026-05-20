@@ -11,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddSingleton<IProductRepository, InMemoryProductRepository>();
         services.AddSingleton<IClock, SystemClock>();
+        services.AddSingleton<IIdGenerator, GuidIdGenerator>();
         return services;
     }
 }
