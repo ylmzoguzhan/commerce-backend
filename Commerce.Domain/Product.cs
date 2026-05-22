@@ -3,14 +3,17 @@ namespace Commerce.Domain;
 public class Product
 {
     public Guid Id { get; private set; }
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; private set; } = null!;
+    public string Description { get; private set; } = null!;
     public decimal Price { get; private set; }
-    public string Currency { get; private set; }
+    public string Currency { get; private set; } = null!;
     public bool IsActive { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
 
+    private Product()
+    {
+    }
     private Product(Guid id, string name, string description, decimal price, string currency, bool isActive, DateTimeOffset createdAt)
     {
         Id = id;
